@@ -102,6 +102,9 @@ if { [ -f "$SYS_VENDOR" ] && grep -q "Synology" "$SYS_VENDOR"; } \
     echo "Synology patches applied!"
 fi
 
+# Use unsafe io for dpkg (we are ephemeral anyway)
+echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/docker-apt-speedup
+
 # Set UOS_SYSTEM_IP
 UNIFI_SYSTEM_PROPERTIES="/var/lib/unifi/system.properties"
 if [ -n "${UOS_SYSTEM_IP+1}" ]; then
