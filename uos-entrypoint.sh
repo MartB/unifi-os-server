@@ -102,6 +102,15 @@ if { [ -f "$SYS_VENDOR" ] && grep -q "Synology" "$SYS_VENDOR"; } \
     echo "Synology patches applied!"
 fi
 
+# Fix bootup delay: Override ubnt-dpkg-restore to only run on actual version upgrades
+# This check is taken from bootup-invoker
+mkdir -p /etc/systemd/system/ubnt-dpkg-restore.service.d
+{
+    echo "[Service]"
+    echo "ExecStart="
+    echo "ExecStart=/bin/bash -c 'if [ -f /persistent/.config/version ] && cmp -s /usr/lib/version /persistent/.config/version; then echo \"Versions match, skipping restore.\"; else /sbin/ubnt-dpkg-restore; fi'"
+} > /etc/systemd/system/ubnt-dpkg-restore.service.d/override.conf
+
 # Set UOS_SYSTEM_IP
 UNIFI_SYSTEM_PROPERTIES="/var/lib/unifi/system.properties"
 if [ -n "${UOS_SYSTEM_IP+1}" ]; then
